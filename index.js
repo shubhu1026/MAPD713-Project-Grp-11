@@ -215,3 +215,43 @@ server.put("/patients/:patientId", function (req, res, next) {
       return next(new errors.InternalServerError("Failed to update patient"));
     });
 });
+
+// Delete patient with the given id
+server.del("/patients/:id", function (req, res, next) {
+  console.log("POST /patients params=>" + JSON.stringify(req.params));
+  // Delete the patient in db
+  PatientsModel.findOneAndDelete({ _id: req.params.id })
+    .then((deletedPatient) => {
+      console.log("deleted patient: " + deletedPatient);
+      if (deletedPatient) {
+        res.send(200, deletedPatient);
+      } else {
+        res.send(404, "Patient not found");
+      }
+      return next();
+    })
+    .catch(() => {
+      console.log("error: " + error);
+      return next(new Error(JSON.stringify(error.errors)));
+    });
+});
+
+// Delete all patients
+server.del("/patients", function (req, res, next) {
+  console.log("POST /Patients params=>" + JSON.stringify(req.params));
+  // Delete the patient in db
+  PatientsModel.deleteMany({})
+    .then((deletedPatient) => {
+      console.log("deleted patient: " + deletedPatient);
+      if (deletedPatient) {
+        res.send(200, deletedPatient);
+      } else {
+        res.send(404, "Patient not found");
+      }
+      return next();
+    })
+    .catch(() => {
+      console.log("error: " + error);
+      return next(new Error(JSON.stringify(error.errors)));
+    });
+});
