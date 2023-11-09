@@ -502,3 +502,38 @@ server.del("/patients/:patientId/medicalTests", function (req, res, next) {
       );
     });
 });
+
+// Get all critical tests for all patients
+server.get("/criticalTests", function (req, res, next) {
+  console.log("GET /criticalTests");
+
+  // Find all patients in the database
+  PatientsModel.find({})
+    .then((patients) => {
+      const allCriticalTests = [];
+
+      // Iterate through all patients
+      patients.forEach((patient) => {
+        // Filter the medical tests in the patient's recordHistory where the condition is critical
+        const criticalTests = patient.recordHistory.filter(
+          (test) => test.condition.toLowerCase() === "critical"
+        );
+
+        // Add the critical tests for this patient to the allCriticalTests array
+        allCriticalTests.push({
+          patientId: patient._id,
+          criticalTests,
+        });
+      });
+
+      // Send the array of critical tests for all patients as a response
+      res.send(allCriticalTests);
+      return next();
+    })
+    .catch((error) => {
+      console.log("error: " + error);
+      return next(
+        new errors.InternalServerError("Failed to retrieve critical tests")
+      );
+    });
+});
