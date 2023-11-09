@@ -315,3 +315,41 @@ server.post("/patients/:id/medicalTests", function (req, res, next) {
       );
     });
 });
+
+// get a specific test of a patient
+server.get(
+  "/patients/:patientId/medicalTests/:testId",
+  function (req, res, next) {
+    console.log(
+      "GET /patients/:patientId/medicalTests/:testId params =>",
+      req.params
+    );
+
+    // Find the patient by their ID
+    PatientsModel.findOne({ _id: req.params.patientId })
+      .then((patient) => {
+        if (!patient) {
+          return next(new errors.NotFoundError("Patient not found"));
+        }
+
+        // Find the specific medical test by its ID
+        const medicalTest = patient.recordHistory.id(req.params.testId);
+
+        if (!medicalTest) {
+          return next(new errors.NotFoundError("Medical test not found"));
+        }
+
+        // Send the details of the specific medical test as a response
+        res.send(medicalTest);
+        return next();
+      })
+      .catch((error) => {
+        console.log("error: " + error);
+        return next(
+          new errors.InternalServerError(
+            "Failed to retrieve medical test details"
+          )
+        );
+      });
+  }
+);
