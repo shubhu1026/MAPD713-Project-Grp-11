@@ -379,3 +379,51 @@ server.get("/patients/:patientId/medicalTests", function (req, res, next) {
       );
     });
 });
+
+// update a test of a patient
+server.put(
+  "/patients/:patientId/medicalTests/:testId",
+  function (req, res, next) {
+    console.log(
+      "PUT /patients/:patientId/medicalTests/:testId params =>",
+      req.params
+    );
+    console.log(
+      "PUT /patients/:patientId/medicalTests/:testId body =>",
+      req.body
+    );
+
+    // Find the patient by their ID
+    PatientsModel.findOne({ _id: req.params.patientId })
+      .then((patient) => {
+        if (!patient) {
+          return next(new errors.NotFoundError("Patient not found"));
+        }
+
+        // Find the specific medical test by its ID
+        const medicalTest = patient.recordHistory.id(req.params.testId);
+
+        if (!medicalTest) {
+          return next(new errors.NotFoundError("Medical test not found"));
+        }
+
+        // Update the specific medical test with the data from the request body
+        medicalTest.set(req.body);
+
+        // Save the updated patient data to the database
+        return patient.save();
+      })
+      .then((updatedPatient) => {
+        console.log("Updated medical test for patient: " + updatedPatient);
+        // Send the updated patient data as a response
+        res.send(updatedPatient);
+        return next();
+      })
+      .catch((error) => {
+        console.log("error: " + error);
+        return next(
+          new errors.InternalServerError("Failed to update medical test")
+        );
+      });
+  }
+);
