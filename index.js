@@ -255,3 +255,63 @@ server.del("/patients", function (req, res, next) {
       return next(new Error(JSON.stringify(error.errors)));
     });
 });
+
+// add a medical test for a patient
+server.post("/patients/:id/medicalTests", function (req, res, next) {
+  console.log(
+    "POST /patients/:id/medicalTests params=>" + JSON.stringify(req.params)
+  );
+  console.log(
+    "POST /patients/:id/medicalTests body=>" + JSON.stringify(req.body)
+  );
+
+  // Find the patient by their ID
+  PatientsModel.findOne({ _id: req.params.id })
+    .then((patient) => {
+      if (!patient) {
+        return next(new errors.NotFoundError("Patient not found"));
+      }
+
+      // Validate and extract the medical record data from the request body
+      const {
+        date,
+        diagnosis,
+        testType,
+        nurse,
+        testTime,
+        category,
+        readings,
+        condition,
+      } = req.body;
+
+      // Create a new medical record object
+      const newMedicalRecord = {
+        date: date || new Date(),
+        diagnosis,
+        testType,
+        nurse,
+        testTime,
+        category,
+        readings,
+        condition,
+      };
+
+      // Add the new medical record to the patient's recordHistory
+      patient.recordHistory.push(newMedicalRecord);
+
+      // Save the updated patient data to the database
+      return patient.save();
+    })
+    .then((updatedPatient) => {
+      console.log("Added medical record to patient: " + updatedPatient);
+      // Send the updated patient data as a response
+      res.send(updatedPatient);
+      return next();
+    })
+    .catch((error) => {
+      console.log("error: " + error);
+      return next(
+        new errors.InternalServerError("Failed to add medical record")
+      );
+    });
+});
