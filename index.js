@@ -427,3 +427,47 @@ server.put(
       });
   }
 );
+
+// delete a test of a patient
+server.del(
+  "/patients/:patientId/medicalTests/:testId",
+  function (req, res, next) {
+    console.log(
+      "DELETE /patients/:patientId/medicalTests/:testId params =>",
+      req.params
+    );
+
+    // Find the patient by their ID
+    PatientsModel.findOne({ _id: req.params.patientId })
+      .then((patient) => {
+        if (!patient) {
+          return next(new errors.NotFoundError("Patient not found"));
+        }
+
+        // Find the specific medical test by its ID
+        const medicalTest = patient.recordHistory.id(req.params.testId);
+
+        if (!medicalTest) {
+          return next(new errors.NotFoundError("Medical test not found"));
+        }
+
+        // Remove the specific medical test from the patient's recordHistory
+        patient.recordHistory.pull(medicalTest);
+
+        // Save the updated patient data to the database
+        return patient.save();
+      })
+      .then((updatedPatient) => {
+        console.log("Deleted medical test for patient: " + updatedPatient);
+        // Send the updated patient data as a response
+        res.send(updatedPatient);
+        return next();
+      })
+      .catch((error) => {
+        console.log("error: " + error);
+        return next(
+          new errors.InternalServerError("Failed to delete medical test")
+        );
+      });
+  }
+);
