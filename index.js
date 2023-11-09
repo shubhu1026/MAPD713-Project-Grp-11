@@ -471,3 +471,34 @@ server.del(
       });
   }
 );
+
+// delete all tests of a patient
+server.del("/patients/:patientId/medicalTests", function (req, res, next) {
+  console.log("DELETE /patients/:patientId/medicalTests params =>", req.params);
+
+  // Find the patient by their ID
+  PatientsModel.findOne({ _id: req.params.patientId })
+    .then((patient) => {
+      if (!patient) {
+        return next(new errors.NotFoundError("Patient not found"));
+      }
+
+      // Remove all medical tests from the patient's recordHistory
+      patient.recordHistory = [];
+
+      // Save the updated patient data to the database
+      return patient.save();
+    })
+    .then((updatedPatient) => {
+      console.log("Deleted all medical tests for patient: " + updatedPatient);
+      // Send the updated patient data as a response
+      res.send(updatedPatient);
+      return next();
+    })
+    .catch((error) => {
+      console.log("error: " + error);
+      return next(
+        new errors.InternalServerError("Failed to delete all medical tests")
+      );
+    });
+});
