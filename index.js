@@ -166,3 +166,52 @@ server.post("/patients", function (req, res, next) {
       return next(new Error(JSON.stringify(error.errors)));
     });
 });
+
+server.put("/patients/:patientId", function (req, res, next) {
+  console.log("PUT /patients/:patientId params =>", req.params);
+  console.log("PUT /patients/:patientId body =>", req.body);
+
+  // Find the patient by their ID
+  PatientsModel.findOne({ _id: req.params.patientId })
+    .then((patient) => {
+      if (!patient) {
+        return next(new errors.NotFoundError("Patient not found"));
+      }
+
+      // Update patient information based on the request body
+      if (req.body.firstName) {
+        patient.firstName = req.body.firstName;
+      }
+      if (req.body.lastName) {
+        patient.lastName = req.body.lastName;
+      }
+      if (req.body.address) {
+        patient.address = req.body.address;
+      }
+      if (req.body.email) {
+        patient.email = req.body.email;
+      }
+      if (req.body.gender) {
+        patient.gender = req.body.gender;
+      }
+      if (req.body.dateOfBirth) {
+        patient.dateOfBirth = req.body.dateOfBirth;
+      }
+      if (req.body.contactNumber) {
+        patient.contactNumber = req.body.contactNumber;
+      }
+
+      // Save the updated patient data to the database
+      return patient.save();
+    })
+    .then((updatedPatient) => {
+      console.log("Updated patient: " + updatedPatient);
+      // Send the updated patient data as a response
+      res.send(updatedPatient);
+      return next();
+    })
+    .catch((error) => {
+      console.log("error: " + error);
+      return next(new errors.InternalServerError("Failed to update patient"));
+    });
+});
