@@ -353,3 +353,29 @@ server.get(
       });
   }
 );
+
+// get all tests of a patient
+server.get("/patients/:patientId/medicalTests", function (req, res, next) {
+  console.log("GET /patients/:patientId/medicalTests params =>", req.params);
+
+  // Find the patient by their ID
+  PatientsModel.findOne({ _id: req.params.patientId })
+    .then((patient) => {
+      if (!patient) {
+        return next(new errors.NotFoundError("Patient not found"));
+      }
+
+      // Retrieve all the medical tests from the patient's recordHistory
+      const medicalTests = patient.recordHistory;
+
+      // Send the array of medical tests as a response
+      res.send(medicalTests);
+      return next();
+    })
+    .catch((error) => {
+      console.log("error: " + error);
+      return next(
+        new errors.InternalServerError("Failed to retrieve medical tests")
+      );
+    });
+});
