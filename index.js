@@ -29,6 +29,7 @@ const patientSchema = new mongoose.Schema({
   address: String,
   email: String,
   gender: String,
+  doctor: String,
   dateOfBirth: String,
   contactNumber: String,
   recordHistory: [
@@ -141,6 +142,10 @@ server.post("/patients", function (req, res, next) {
     // If there are any errors, pass them to next in the correct format
     return next(new errors.BadRequestError("Contact Number Must Be Provided"));
   }
+  if (req.body.doctor === undefined) {
+    // If there are any errors, pass them to next in the correct format
+    return next(new errors.BadRequestError("Doctor Must Be Provided"));
+  }
 
   let newPatient = new PatientsModel({
     firstName: req.body.firstName,
@@ -148,6 +153,7 @@ server.post("/patients", function (req, res, next) {
     address: req.body.address,
     email: req.body.email,
     gender: req.body.gender,
+    doctor: req.body.doctor,
     dateOfBirth: req.body.dateOfBirth,
     contactNumber: req.body.contactNumber,
   });
@@ -196,6 +202,9 @@ server.put("/patients/:patientId", function (req, res, next) {
       }
       if (req.body.dateOfBirth) {
         patient.dateOfBirth = req.body.dateOfBirth;
+      }
+      if (req.body.doctor) {
+        patient.doctor = req.body.doctor;
       }
       if (req.body.contactNumber) {
         patient.contactNumber = req.body.contactNumber;
@@ -503,8 +512,33 @@ server.del("/patients/:patientId/medicalTests", function (req, res, next) {
     });
 });
 
+server.get("/patients/criticalPatients", function (req, res, next) {
+  console.log("GET /criticalPatients");
+
+  // Find all patients in the database
+  PatientsModel.find({})
+    .then((patients) => {
+      const criticalPatients = patients.filter((patient) => {
+        // Check if the patient has any tests with critical status
+        return patient.recordHistory.some(
+          (test) => test.condition.toLowerCase() === "critical"
+        );
+      });
+
+      // Send the array of critical patients as a response
+      res.send(criticalPatients);
+      return next();
+    })
+    .catch((error) => {
+      console.log("error: " + error);
+      return next(
+        new errors.InternalServerError("Failed to retrieve critical patients")
+      );
+    });
+});
+
 // Get all critical tests for all patients
-server.get("/criticalTests", function (req, res, next) {
+server.get("/patients/criticalTests", function (req, res, next) {
   console.log("GET /criticalTests");
 
   // Find all patients in the database
