@@ -265,7 +265,6 @@ server.del("/patients", function (req, res, next) {
     });
 });
 
-// add a medical test for a patient
 server.post("/patients/:id/medicalTests", function (req, res, next) {
   console.log(
     "POST /patients/:id/medicalTests params=>" + JSON.stringify(req.params)
@@ -281,28 +280,42 @@ server.post("/patients/:id/medicalTests", function (req, res, next) {
         return next(new errors.NotFoundError("Patient not found"));
       }
 
-      // Validate and extract the medical record data from the request body
-      const {
-        date,
-        diagnosis,
-        testType,
-        nurse,
-        testTime,
-        category,
-        readings,
-        condition,
-      } = req.body;
+      // Extract testType and condition from the request body
+      const { testType, condition } = req.body;
+
+      // Find all critical tests of the same type for the patient
+      const criticalTestsSameType = patient.recordHistory.filter(
+        (test) =>
+          test.testType.toLowerCase() === testType.toLowerCase() &&
+          test.condition.toLowerCase() === "critical"
+      );
+
+      // If critical tests of the same type exist, determine the most recent one
+      let mostRecentCriticalTest = null;
+      let mostRecentDate = new Date(0); // Initialize with a date far in the past
+
+      criticalTestsSameType.forEach((test) => {
+        if (test.date > mostRecentDate) {
+          mostRecentCriticalTest = test;
+          mostRecentDate = test.date;
+        }
+      });
+
+      // Remove the most recent critical test of the same type
+      if (mostRecentCriticalTest) {
+        patient.recordHistory.pull(mostRecentCriticalTest);
+      }
 
       // Create a new medical record object
       const newMedicalRecord = {
-        date: date || new Date(),
-        diagnosis,
-        testType,
-        nurse,
-        testTime,
-        category,
-        readings,
-        condition,
+        date: req.body.date || new Date(),
+        diagnosis: req.body.diagnosis,
+        testType: req.body.testType,
+        nurse: req.body.nurse,
+        testTime: req.body.testTime,
+        category: req.body.category,
+        readings: req.body.readings,
+        condition: req.body.condition,
       };
 
       // Add the new medical record to the patient's recordHistory
@@ -312,7 +325,9 @@ server.post("/patients/:id/medicalTests", function (req, res, next) {
       return patient.save();
     })
     .then((updatedPatient) => {
-      console.log("Added medical record to patient: " + updatedPatient);
+      console.log(
+        "Added/Updated medical record for patient: " + updatedPatient
+      );
       // Send the updated patient data as a response
       res.send(updatedPatient);
       return next();
@@ -320,7 +335,7 @@ server.post("/patients/:id/medicalTests", function (req, res, next) {
     .catch((error) => {
       console.log("error: " + error);
       return next(
-        new errors.InternalServerError("Failed to add medical record")
+        new errors.InternalServerError("Failed to add/update medical record")
       );
     });
 });
