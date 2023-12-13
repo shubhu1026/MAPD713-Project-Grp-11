@@ -1,6 +1,6 @@
 let SERVER_NAME = "patient-api";
-let PORT = 5000;
-let HOST = "127.0.0.1";
+let PORT = process.env.PORT || 5000;
+//let HOST = "127.0.0.1";
 
 const mongoose = require("mongoose");
 const username = "anmolsharma55555";
@@ -58,7 +58,7 @@ let restify = require("restify"),
   // Create the restify server
   server = restify.createServer({ name: SERVER_NAME });
 
-server.listen(PORT, HOST, function () {
+server.listen(PORT, function () {
   console.log("Server %s listening at %s", server.name, server.url);
   console.log("**** Resources: ****");
   console.log("********************");
@@ -290,20 +290,26 @@ server.post("/patients/:id/medicalTests", function (req, res, next) {
           test.condition.toLowerCase() === "critical"
       );
 
-      // If critical tests of the same type exist, determine the most recent one
-      let mostRecentCriticalTest = null;
-      let mostRecentDate = new Date(0); // Initialize with a date far in the past
+      // If critical tests of the same type exist and the new test is not critical,
+      // determine the most recent critical test to remove it
+      if (
+        criticalTestsSameType.length > 0 &&
+        condition.toLowerCase() !== "critical"
+      ) {
+        let mostRecentCriticalTest = null;
+        let mostRecentDate = new Date(0); // Initialize with a date far in the past
 
-      criticalTestsSameType.forEach((test) => {
-        if (test.date > mostRecentDate) {
-          mostRecentCriticalTest = test;
-          mostRecentDate = test.date;
+        criticalTestsSameType.forEach((test) => {
+          if (test.date > mostRecentDate) {
+            mostRecentCriticalTest = test;
+            mostRecentDate = test.date;
+          }
+        });
+
+        // Remove the most recent critical test of the same type
+        if (mostRecentCriticalTest) {
+          patient.recordHistory.pull(mostRecentCriticalTest);
         }
-      });
-
-      // Remove the most recent critical test of the same type
-      if (mostRecentCriticalTest) {
-        patient.recordHistory.pull(mostRecentCriticalTest);
       }
 
       // Create a new medical record object
