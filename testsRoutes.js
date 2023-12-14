@@ -1,6 +1,26 @@
 const errors = require("restify-errors");
 const PatientsModel = require("./PatientsModel");
 
+function convertTestTimeToDate(testTime, testDate) {
+  // Split the test time string into hours, minutes, and AM/PM parts
+  const [time, meridian] = testTime.split(" ");
+  const [hours, minutes] = time.split(".");
+
+  // Convert hours to 24-hour format
+  let hourValue = parseInt(hours, 10);
+  if (meridian === "PM" && hourValue !== 12) {
+    hourValue += 12;
+  } else if (meridian === "AM" && hourValue === 12) {
+    hourValue = 0;
+  }
+
+  // Create a new date object using the provided testDate and set the hours and minutes
+  const currentDate = new Date(testDate);
+  currentDate.setHours(hourValue, parseInt(minutes, 10), 0, 0);
+
+  return currentDate;
+}
+
 function addNewTest(req, res, next) {
   console.log(
     "POST /patients/:id/medicalTests params=>" + JSON.stringify(req.params)
@@ -27,6 +47,9 @@ function addNewTest(req, res, next) {
         readings,
         condition,
       } = req.body;
+
+      const testDate = new Date(date); // Replace this with the desired date
+      const convertedTestTime = convertTestTimeToDate(testTime, testDate);
 
       // Check if the required fields are present in the request body
       if (
@@ -90,11 +113,11 @@ function addNewTest(req, res, next) {
 
       // Create a new medical record object with the updated condition
       const newMedicalRecord = {
-        date: date || new Date(),
+        date: testDate,
         diagnosis,
         testType,
         nurse,
-        testTime,
+        testTime: convertedTestTime,
         category,
         readings,
         condition: newCondition,
