@@ -53,7 +53,7 @@ server.del("/patients", patientsRoutes.deleteAllPatients);
 server.get("/patients/criticalPatients", patientsRoutes.getCriticalPatients);
 
 //Tests Routes
-server.post("/patients/:id/medicalTests", testsRoutes.addNewPatient);
+server.post("/patients/:id/medicalTests", testsRoutes.addNewTest);
 server.get(
   "/patients/:patientId/medicalTests/:testId",
   testsRoutes.getSpecificTestOfPatient
