@@ -203,7 +203,7 @@ function deletePatient(req, res, next) {
       }
       return next();
     })
-    .catch(() => {
+    .catch((error) => {
       console.log("error: " + error);
       return next(new Error(JSON.stringify(error.errors)));
     });
@@ -222,7 +222,7 @@ function deleteAllPatients(req, res, next) {
       }
       return next();
     })
-    .catch(() => {
+    .catch((error) => {
       console.log("error: " + error);
       return next(new Error(JSON.stringify(error.errors)));
     });
