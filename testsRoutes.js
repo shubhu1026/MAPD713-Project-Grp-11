@@ -40,7 +40,15 @@ function addNewTest(req, res, send) {
         return next(new errors.BadRequestError("Required fields are missing"));
       }
 
-      let newCondition = condition || ""; // default to empty string if condition is not provided
+      // Parse the readings as a float
+      const parsedReadings = parseFloat(readings);
+
+      // Check if readings input is valid
+      if (isNaN(parsedReadings)) {
+        return next(new errors.BadRequestError("Readings must be a number"));
+      }
+
+      let newCondition = condition || "";
 
       // Set the condition based on test type and readings
       switch (testType.toLowerCase()) {
@@ -76,7 +84,6 @@ function addNewTest(req, res, send) {
             newCondition = "Healthy";
           }
           break;
-        // Add other test types here
         default:
           break;
       }
