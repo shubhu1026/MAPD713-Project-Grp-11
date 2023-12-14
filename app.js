@@ -1,29 +1,27 @@
-const restify = require("restify");
-const mongoose = require("mongoose");
+function parseHumanReadableTime(timeString) {
+  const [hoursMinutes, ampm] = timeString.split(" ");
 
-const server = restify.createServer();
+  let [hours, minutes] = hoursMinutes.split(".");
+  hours = parseInt(hours);
+  minutes = parseInt(minutes || 0);
 
-// MongoDB connection setup
-mongoose.connect(uristring, { useNewUrlParser: true });
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", () => {
-  console.log("Connected to MongoDB!");
-});
+  if (ampm === "pm" && hours !== 12) {
+    hours += 12;
+  } else if (ampm === "am" && hours === 12) {
+    hours = 0;
+  }
 
-server.use(restify.plugins.fullResponse());
-server.use(restify.plugins.bodyParser());
+  const date = new Date();
+  date.setHours(hours);
+  date.setMinutes(minutes);
 
-// Require and use routes
-const patientRoutes = require("./routes/patientRoutes");
-const medicalTestRoutes = require("./routes/medicalTestRoutes");
+  return date;
+}
 
-patientRoutes.applyRoutes(server);
-medicalTestRoutes.applyRoutes(server);
+// Test different time formats
+const timeFormats = ["10.20 am", "11.45 pm", "9.15 am"];
 
-const PORT = process.env.PORT || 5000;
-const HOST = process.env.HOST || "127.0.0.1";
-
-server.listen(PORT, HOST, function () {
-  console.log(`Server is running at ${HOST}:${PORT}`);
+timeFormats.forEach((format) => {
+  const parsedTime = parseHumanReadableTime(format);
+  console.log(`Input: ${format} => Parsed Time: ${parsedTime}`);
 });

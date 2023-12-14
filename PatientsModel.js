@@ -9,7 +9,7 @@ const patientSchema = new mongoose.Schema({
   email: String,
   gender: String,
   doctor: String,
-  dateOfBirth: String,
+  dateOfBirth: Date,
   contactNumber: String,
   recordHistory: [
     {
@@ -20,7 +20,7 @@ const patientSchema = new mongoose.Schema({
       diagnosis: String,
       testType: String,
       nurse: String,
-      testTime: String,
+      testTime: Date,
       category: String,
       readings: String,
       condition: String,
