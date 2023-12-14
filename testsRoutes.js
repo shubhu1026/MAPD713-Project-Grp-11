@@ -28,7 +28,7 @@ function addNewTest(req, res, next) {
         condition,
       } = req.body;
 
-      const completeTimestamp = new Date(`${testDate} ${testTime}`);
+      const completeTimestamp = new Date(`${date} ${testTime}`);
 
       // Check if the required fields are present in the request body
       if (
