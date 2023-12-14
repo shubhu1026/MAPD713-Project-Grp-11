@@ -1,7 +1,7 @@
 const errors = require("restify-errors");
 const PatientsModel = require("./PatientsModel");
 
-function addNewTest(req, res, send) {
+function addNewTest(req, res, next) {
   console.log(
     "POST /patients/:id/medicalTests params=>" + JSON.stringify(req.params)
   );
@@ -154,7 +154,7 @@ function getSpecificTestOfPatient(req, res, next) {
     });
 }
 
-function getAllTestsOfPatient(req, res, send) {
+function getAllTestsOfPatient(req, res, next) {
   console.log("GET /patients/:patientId/medicalTests params =>", req.params);
 
   // Find the patient by their ID
@@ -179,7 +179,7 @@ function getAllTestsOfPatient(req, res, send) {
     });
 }
 
-function updatePatientTest(req, res, send) {
+function updatePatientTest(req, res, next) {
   console.log(
     "PUT /patients/:patientId/medicalTests/:testId params =>",
     req.params
@@ -298,7 +298,7 @@ function updatePatientTest(req, res, send) {
     });
 }
 
-function deletePatientTest(req, res, send) {
+function deletePatientTest(req, res, next) {
   console.log(
     "DELETE /patients/:patientId/medicalTests/:testId params =>",
     req.params
@@ -338,7 +338,7 @@ function deletePatientTest(req, res, send) {
     });
 }
 
-function deleteAllTestsOfPatient(req, res, send) {
+function deleteAllTestsOfPatient(req, res, next) {
   console.log("DELETE /patients/:patientId/medicalTests params =>", req.params);
 
   // Find the patient by their ID
@@ -368,7 +368,7 @@ function deleteAllTestsOfPatient(req, res, send) {
     });
 }
 
-function getAllCriticalTests(req, res, send) {
+function getAllCriticalTests(req, res, next) {
   console.log("GET /criticalTests");
 
   // Find all patients in the database
