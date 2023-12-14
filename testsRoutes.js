@@ -2,19 +2,16 @@ const errors = require("restify-errors");
 const PatientsModel = require("./PatientsModel");
 
 function convertTestTimeToDate(testTime, testDate) {
-  // Split the test time string into hours, minutes, and AM/PM parts
   const [time, meridian] = testTime.split(" ");
-  const [hours, minutes] = time.split(".");
+  const [hours, minutes] = time.split(":");
 
-  // Convert hours to 24-hour format
   let hourValue = parseInt(hours, 10);
-  if (meridian === "PM" && hourValue !== 12) {
+  if (meridian.toLowerCase() === "pm" && hourValue !== 12) {
     hourValue += 12;
-  } else if (meridian === "AM" && hourValue === 12) {
+  } else if (meridian.toLowerCase() === "am" && hourValue === 12) {
     hourValue = 0;
   }
 
-  // Create a new date object using the provided testDate and set the hours and minutes
   const currentDate = new Date(testDate);
   currentDate.setHours(hourValue, parseInt(minutes, 10), 0, 0);
 
@@ -48,9 +45,6 @@ function addNewTest(req, res, next) {
         condition,
       } = req.body;
 
-      const testDate = new Date(date); // Replace this with the desired date
-      const convertedTestTime = convertTestTimeToDate(testTime, testDate);
-
       // Check if the required fields are present in the request body
       if (
         !date ||
@@ -65,6 +59,15 @@ function addNewTest(req, res, next) {
 
       // Parse the readings as a float
       const parsedReadings = parseFloat(readings);
+
+      const testDate = new Date(date); // Replace this with the desired date
+
+      // Check if testDate is a valid date
+      if (isNaN(testDate.getTime())) {
+        return next(new errors.BadRequestError("Invalid date format"));
+      }
+
+      const convertedTestTime = convertTestTimeToDate(testTime, testDate);
 
       // Check if readings input is valid
       if (isNaN(parsedReadings)) {
