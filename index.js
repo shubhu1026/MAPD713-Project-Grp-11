@@ -59,7 +59,7 @@ server.put("/patients/:patientId", patientsRoutes.updatePatient);
 server.del("/patients/:id", patientsRoutes.deletePatient);
 server.del("/patients", patientsRoutes.deleteAllPatients);
 // Get critical patients
-server.get("/patients/criticalPatients", patientsRoutes.getCriticalPatients);
+server.get("/criticalPatients", patientsRoutes.getCriticalPatients);
 
 //Tests Routes
 server.post("/patients/:id/medicalTests", testsRoutes.addNewTest);
