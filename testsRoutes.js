@@ -114,7 +114,7 @@ function addNewTest(req, res, send) {
     });
 }
 
-function getSpecificTestOfPatient(req, res, send) {
+function getSpecificTestOfPatient(req, res, next) {
   console.log(
     "GET /patients/:patientId/medicalTests/:testId params =>",
     req.params
@@ -135,8 +135,7 @@ function getSpecificTestOfPatient(req, res, send) {
       }
 
       // Send the details of the specific medical test as a response
-      res.send(medicalTest);
-      return next();
+      return res.send(medicalTest); // Return the response directly
     })
     .catch((error) => {
       console.log("error: " + error);
