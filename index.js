@@ -42,6 +42,15 @@ server.listen(PORT, function () {
 server.use(restify.plugins.fullResponse());
 server.use(restify.plugins.bodyParser());
 
+server.get("/", function (req, res, next) {
+  try {
+    res.send(200, "Server is up and running!");
+  } catch (error) {
+    console.error("Error in handling the request:", error);
+    res.send(500, "Internal Server Error");
+  }
+});
+
 // Patient Routes
 server.get("/patients", patientsRoutes.getAllPatients);
 server.get("/patients/:id", patientsRoutes.getSinglePatient);
