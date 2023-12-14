@@ -20,7 +20,7 @@ const patientSchema = new mongoose.Schema({
       diagnosis: String,
       testType: String,
       nurse: String,
-      testTime: Date,
+      testTime: String,
       category: String,
       readings: String,
       condition: String,
