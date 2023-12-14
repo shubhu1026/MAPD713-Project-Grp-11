@@ -55,7 +55,7 @@ server.get("/", function (req, res, next) {
 server.get("/patients", patientsRoutes.getAllPatients);
 server.get("/patients/:id", patientsRoutes.getSinglePatient);
 server.post("/patients", patientsRoutes.addNewPatient);
-server.put("/patients/:patientId", patientsRoutes.addNewPatient);
+server.put("/patients/:patientId", patientsRoutes.updatePatient);
 server.del("/patients/:id", patientsRoutes.deletePatient);
 server.del("/patients", patientsRoutes.deleteAllPatients);
 // Get critical patients
