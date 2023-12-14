@@ -222,10 +222,53 @@ function updatePatientTest(req, res, send) {
         !testType ||
         !nurse ||
         !testTime ||
-        !readings ||
-        !condition
+        !readings
       ) {
         return next(new errors.BadRequestError("Required fields are missing"));
+      }
+
+      // Parse the readings as a float
+      const parsedReadings = parseFloat(readings);
+
+      // Check if readings input is valid
+      if (isNaN(parsedReadings)) {
+        return next(new errors.BadRequestError("Readings must be a number"));
+      }
+
+      let newCondition = condition || "";
+
+      // Set the condition based on test type and readings
+      switch (testType.toLowerCase()) {
+        case "blood pressure test":
+          if (parsedReadings < 90 || parsedReadings > 140) {
+            newCondition = "Critical";
+          } else {
+            newCondition = "Normal";
+          }
+          break;
+        case "blood sugar test":
+          if (parsedReadings < 80 || parsedReadings > 180) {
+            newCondition = "Critical";
+          } else {
+            newCondition = "Normal";
+          }
+          break;
+        case "cholesterol test":
+          if (parsedReadings > 240) {
+            newCondition = "Critical";
+          } else {
+            newCondition = "Normal";
+          }
+          break;
+        case "complete blood count (cbc)":
+          if (parsedReadings < 4.5 || parsedReadings > 10) {
+            newCondition = "Critical";
+          } else {
+            newCondition = "Healthy";
+          }
+          break;
+        default:
+          break;
       }
 
       // Update the specific medical test
@@ -236,7 +279,7 @@ function updatePatientTest(req, res, send) {
       medicalTest.testTime = testTime;
       medicalTest.category = category;
       medicalTest.readings = readings;
-      medicalTest.condition = condition;
+      medicalTest.condition = newCondition;
 
       // Save the updated patient data to the database
       return patient.save();
