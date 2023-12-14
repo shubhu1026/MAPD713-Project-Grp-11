@@ -258,14 +258,12 @@ function getCriticalPatients(req, res, next) {
         );
 
         if (criticalTestTypes) {
-          // If any critical test types found, add the patient to criticalPatients array
           criticalPatients.push(patient);
         }
       });
 
       // Send the array of critical patients as a response
       res.send(criticalPatients);
-      return next();
     })
     .catch((error) => {
       console.log("error: " + error);
