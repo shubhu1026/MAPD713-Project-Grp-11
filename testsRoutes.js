@@ -28,7 +28,7 @@ function addNewTest(req, res, next) {
         condition,
       } = req.body;
 
-      testTime = new Date(req.body.testTime);
+      const completeTimestamp = new Date(`${testDate} ${testTime}`);
 
       // Check if the required fields are present in the request body
       if (
@@ -96,7 +96,7 @@ function addNewTest(req, res, next) {
         diagnosis,
         testType,
         nurse,
-        testTime,
+        testTime: completeTimestamp,
         category,
         readings,
         condition: newCondition,
