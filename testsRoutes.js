@@ -353,12 +353,12 @@ function getAllCriticalTests(req, res, send) {
     });
 }
 
-module.exports(
+module.exports = {
   addNewTest,
   getSpecificTestOfPatient,
   getAllTestsOfPatient,
   updatePatientTest,
   deletePatientTest,
   deleteAllTestsOfPatient,
-  getAllCriticalTests
-);
+  getAllCriticalTests,
+};
