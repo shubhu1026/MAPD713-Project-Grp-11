@@ -1,23 +1,6 @@
 const errors = require("restify-errors");
 const PatientsModel = require("./PatientsModel");
 
-function convertTestTimeToDate(testTime, testDate) {
-  const [time, meridian] = testTime.split(" ");
-  const [hours, minutes] = time.split(":");
-
-  let hourValue = parseInt(hours, 10);
-  if (meridian.toLowerCase() === "pm" && hourValue !== 12) {
-    hourValue += 12;
-  } else if (meridian.toLowerCase() === "am" && hourValue === 12) {
-    hourValue = 0;
-  }
-
-  const currentDate = new Date(testDate);
-  currentDate.setHours(hourValue, parseInt(minutes, 10), 0, 0);
-
-  return currentDate;
-}
-
 function addNewTest(req, res, next) {
   console.log(
     "POST /patients/:id/medicalTests params=>" + JSON.stringify(req.params)
@@ -59,15 +42,6 @@ function addNewTest(req, res, next) {
 
       // Parse the readings as a float
       const parsedReadings = parseFloat(readings);
-
-      const testDate = new Date(date); // Replace this with the desired date
-
-      // Check if testDate is a valid date
-      if (isNaN(testDate.getTime())) {
-        return next(new errors.BadRequestError("Invalid date format"));
-      }
-
-      const convertedTestTime = convertTestTimeToDate(testTime, testDate);
 
       // Check if readings input is valid
       if (isNaN(parsedReadings)) {
@@ -116,11 +90,11 @@ function addNewTest(req, res, next) {
 
       // Create a new medical record object with the updated condition
       const newMedicalRecord = {
-        date: testDate,
+        date,
         diagnosis,
         testType,
         nurse,
-        testTime: convertedTestTime,
+        testTime,
         category,
         readings,
         condition: newCondition,
