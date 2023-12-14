@@ -28,6 +28,8 @@ function addNewTest(req, res, next) {
         condition,
       } = req.body;
 
+      testTime = new Date(req.body.testTime);
+
       // Check if the required fields are present in the request body
       if (
         !date ||
