@@ -96,7 +96,6 @@ function addNewPatient(req, res, next) {
       return next();
     })
     .catch((error) => {
-      console.log("error: " + error);
       return next(new Error(JSON.stringify(error.errors)));
     });
 }
