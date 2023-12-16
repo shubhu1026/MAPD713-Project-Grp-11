@@ -4,7 +4,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-const uri = "http://127.0.0.1:5000";
+const uri = "https://medicare-rest-api.onrender.com";
 
 describe("Patients API", () => {
   describe("when we issue a 'GET' to /patients", () => {
@@ -60,7 +60,7 @@ describe("Patients API", () => {
 
   describe("when we issue a 'GET' to /patients/:id", () => {
     it("should return a specific patient by ID", (done) => {
-      const patientId = "654b237254081faa8c8963c2";
+      const patientId = "654b238154081faa8c8963c4";
       chai
         .request(uri)
         .get(`/patients/${patientId}`)

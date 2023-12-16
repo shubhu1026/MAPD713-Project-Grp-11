@@ -90,7 +90,7 @@ function addNewTest(req, res, next) {
 
       // Create a new medical record object with the updated condition
       const newMedicalRecord = {
-        date,
+        date: date || new Date(),
         diagnosis,
         testType,
         nurse,
