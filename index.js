@@ -1,6 +1,6 @@
 let SERVER_NAME = "patient-api";
 let PORT = process.env.PORT || 5000;
-let HOST = "127.0.0.1";
+let HOST = process.env.PORT || "127.0.0.1";
 
 const patientsRoutes = require("./patientsRoutes");
 const testsRoutes = require("./testsRoutes");
