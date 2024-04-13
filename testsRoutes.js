@@ -254,7 +254,7 @@ function updatePatientTest(req, res, next) {
           }
           break;
         case "cholesterol test":
-          if (parsedReadings > 240) {
+          if (parsedReadings < 50 || parsedReadings > 180) {
             newCondition = "Critical";
           } else {
             newCondition = "Normal";
@@ -264,7 +264,7 @@ function updatePatientTest(req, res, next) {
           if (parsedReadings < 4.5 || parsedReadings > 10) {
             newCondition = "Critical";
           } else {
-            newCondition = "Healthy";
+            newCondition = "Normal";
           }
           break;
         default:
