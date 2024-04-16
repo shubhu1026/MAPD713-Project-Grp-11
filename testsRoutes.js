@@ -70,7 +70,7 @@ function addNewTest(req, res, next) {
           break;
         case "cholesterol test":
           const cholesterolReadings = parseFloat(readings);
-          if (cholesterolReadings > 240) {
+          if (parsedReadings < 50 || parsedReadings > 180) {
             newCondition = "Critical";
           } else {
             newCondition = "Normal";
