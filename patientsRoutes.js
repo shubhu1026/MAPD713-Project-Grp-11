@@ -245,7 +245,7 @@ function getCriticalPatients(req, res, next) {
 
           if (
             !recentTestsByType[testType] ||
-            test.date > recentTestsByType[testType].date
+            test.testTime > recentTestsByType[testType].testTime
           ) {
             recentTestsByType[testType] = test;
           }
